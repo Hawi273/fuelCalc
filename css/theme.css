@@ -1,0 +1,46 @@
+/* Kolory i czcionki. Jasny motyw jest domyślny, ciemny włącza się
+   automatycznie albo przez atrybut data-theme="dark". */
+
+:root {
+  --bg: #eef0f2;
+  --surface: #ffffff;
+  --field: #f6f7f8;
+  --ink: #1c232b;
+  --muted: #5d6874;
+  --line: #d5dade;
+  --accent: #f2b705;
+  --accent-ink: #1c232b;
+  --danger: #c0392b;
+
+  --display: "Archivo", system-ui, sans-serif;
+  --body: "Inter Tight", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14191e;
+    --surface: #1d242b;
+    --field: #252d35;
+    --ink: #e8ecef;
+    --muted: #9aa5b0;
+    --line: #2e3740;
+    --accent: #f5c02e;
+    --accent-ink: #14191e;
+    --danger: #e8705f;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #14191e;
+  --surface: #1d242b;
+  --field: #252d35;
+  --ink: #e8ecef;
+  --muted: #9aa5b0;
+  --line: #2e3740;
+  --accent: #f5c02e;
+  --accent-ink: #14191e;
+  --danger: #e8705f;
+  color-scheme: dark;
+}

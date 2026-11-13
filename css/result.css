@@ -1,0 +1,55 @@
+/* Karta z wynikiem obliczeń. */
+
+.result {
+  background: var(--ink);
+  color: var(--bg);
+  border: 0;
+}
+
+.result h2 {
+  color: color-mix(in srgb, var(--bg) 65%, var(--ink));
+}
+
+.big {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 40px;
+  align-items: baseline;
+}
+
+.big .k {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.big .v {
+  font: 600 clamp(30px, 8vw, 44px) var(--mono);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.big .v.acc {
+  color: var(--accent);
+}
+
+.rows {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed color-mix(in srgb, var(--bg) 35%, transparent);
+  display: grid;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.rows div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rows div span:first-child {
+  opacity: 0.75;
+  font-family: var(--body);
+}

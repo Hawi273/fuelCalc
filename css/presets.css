@@ -1,0 +1,80 @@
+/* Sekcja presetów: zapis, lista zapisanych, komunikaty. */
+
+.save {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.save .field {
+  flex: 1;
+  min-width: 180px;
+}
+
+.save .field input {
+  font: 500 15px var(--body);
+}
+
+.msg {
+  min-height: 20px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 8px 8px 12px;
+  background: var(--field);
+}
+
+.chip .info {
+  flex: 1;
+  min-width: 0;
+}
+
+.chip .name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.chip .meta {
+  font: 400 12px var(--mono);
+  color: var(--muted);
+}
+
+.chip button {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font: 600 13px var(--body);
+  cursor: pointer;
+}
+
+.chip button.del {
+  color: var(--danger);
+}
+
+.chip button.yes {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}

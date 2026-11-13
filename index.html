@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator dojazdu</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;600&family=Inter+Tight:wght@400;500;600&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* Layout: one column card stack — inputs on asphalt-grey, result "receipt" with road-sign amber accent */
+:root{
+  --bg:#eef0f2; --surface:#ffffff; --ink:#1c232b; --muted:#5d6874; --line:#d5dade;
+  --accent:#f2b705; --accent-ink:#1c232b; --danger:#c0392b; --field:#f6f7f8;
+  --display:"Archivo",system-ui,sans-serif; --body:"Inter Tight",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14191e; --surface:#1d242b; --ink:#e8ecef; --muted:#9aa5b0; --line:#2e3740;
+  --accent:#f5c02e; --accent-ink:#14191e; --danger:#e8705f; --field:#252d35; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14191e; --surface:#1d242b; --ink:#e8ecef; --muted:#9aa5b0; --line:#2e3740;
+  --accent:#f5c02e; --accent-ink:#14191e; --danger:#e8705f; --field:#252d35; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,6vw,40px);letter-spacing:-.02em;margin:0;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted)}
+.road{height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,var(--accent) 0 28px,transparent 28px 44px);margin-top:14px}
+section{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+h2{font-family:var(--display);font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 14px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:520px){.grid{grid-template-columns:1fr}}
+label{display:flex;flex-direction:column;gap:6px;font-weight:500;font-size:14px}
+.field{display:flex;align-items:center;background:var(--field);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+.field input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:600 17px var(--mono);padding:10px 12px;outline:none}
+.field span{padding:0 12px;color:var(--muted);font:400 13px var(--mono);white-space:nowrap}
+.stepper button{border:0;background:transparent;color:var(--ink);font:600 20px var(--mono);width:42px;align-self:stretch;cursor:pointer}
+.stepper button:hover{background:var(--line)}
+.toggle{display:flex;align-items:center;gap:10px;flex-direction:row;cursor:pointer;margin-top:4px}
+.toggle input{width:20px;height:20px;accent-color:var(--accent)}
+.result{background:var(--ink);color:var(--bg);border:0}
+.result h2{color:color-mix(in srgb,var(--bg) 65%,var(--ink))}
+.big{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:baseline}
+.big .k{font-size:13px;opacity:.75}
+.big .v{font:600 clamp(30px,8vw,44px) var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.big .v.acc{color:var(--accent)}
+.rows{margin-top:16px;border-top:1px dashed color-mix(in srgb,var(--bg) 35%,transparent);padding-top:12px;display:grid;gap:6px;font-family:var(--mono);font-size:14px}
+.rows div{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.rows div span:first-child{opacity:.75;font-family:var(--body)}
+.save{display:flex;gap:10px;flex-wrap:wrap}
+.save .field{flex:1;min-width:180px}
+.save .field input{font:500 15px var(--body)}
+.btn{border:0;border-radius:8px;padding:10px 18px;font:700 14px var(--display);cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible,.chip button:focus-visible,.stepper button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.msg{min-height:20px;font-size:13px;color:var(--muted);margin-top:8px}
+.list{display:grid;gap:8px;margin-top:14px}
+.chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:8px 8px 8px 12px;background:var(--field)}
+.chip .info{flex:1;min-width:0}
+.chip .name{font-weight:600;overflow-wrap:anywhere}
+.chip .meta{font:400 12px var(--mono);color:var(--muted)}
+.chip button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:6px 10px;font:600 13px var(--body);cursor:pointer}
+.chip button.del{color:var(--danger)}
+.chip button.yes{background:var(--danger);border-color:var(--danger);color:#fff}
+.empty{color:var(--muted);font-size:14px;margin-top:12px}
+@media (prefers-reduced-motion:no-preference){.v{transition:color .2s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Ile kosztuje dojazd?</h1>
+    <p>Wpisz trasę i auto, a policzę koszt paliwa na cały samochód i na osobę.</p>
+    <div class="road"></div>
+  </header>
+
+  <section>
+    <h2>Trasa i auto</h2>
+    <div class="grid">
+      <label for="dist">Dystans jednego przejazdu
+        <div class="field"><input id="dist" type="number" inputmode="decimal" min="0" step="0.1" value="320"><span>km</span></div>
+      </label>
+      <label for="cons">Średnie spalanie
+        <div class="field"><input id="cons" type="number" inputmode="decimal" min="0" step="0.1" value="6.5"><span>l/100 km</span></div>
+      </label>
+      <label for="price">Cena paliwa
+        <div class="field"><input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="6.29"><span>zł/l</span></div>
+      </label>
+      <label for="people">Liczba osób w aucie
+        <div class="field stepper"><button type="button" id="minus" aria-label="Mniej osób">−</button><input id="people" type="number" inputmode="numeric" min="1" max="9" step="1" value="3" style="text-align:center"><button type="button" id="plus" aria-label="Więcej osób">+</button></div>
+      </label>
+      <label for="extra">Dodatkowe koszty (autostrada, parking)
+        <div class="field"><input id="extra" type="number" inputmode="decimal" min="0" step="1" value="0"><span>zł</span></div>
+      </label>
+      <label for="trips">Liczba przejazdów
+        <div class="field stepper"><button type="button" id="tminus" aria-label="Mniej przejazdów">−</button><input id="trips" type="number" inputmode="numeric" min="1" max="999" step="1" value="2" style="text-align:center"><button type="button" id="tplus" aria-label="Więcej przejazdów">+</button></div>
+      </label>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <h2>Wynik</h2>
+    <div class="big">
+      <div><div class="k">Na osobę</div><div class="v acc" id="rPer">–</div></div>
+      <div><div class="k">Cały samochód</div><div class="v" id="rTotal">–</div></div>
+    </div>
+    <div class="rows">
+      <div><span>Przejechany dystans</span><span id="rKm">–</span></div>
+      <div><span>Zużyte paliwo</span><span id="rL">–</span></div>
+      <div><span>Koszt paliwa</span><span id="rFuel">–</span></div>
+      <div><span>Koszt za 1 km</span><span id="rPerKm">–</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Presety</h2>
+    <div class="save">
+      <div class="field"><input id="pname" type="text" maxlength="40" placeholder="Nazwa, np. Kraków – Zakopane"></div>
+      <button class="btn" id="saveBtn" type="button">Zapisz bieżące dane</button>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="list" id="list"></div>
+    <p class="empty" id="empty">Nie masz jeszcze presetów. Ustaw dane powyżej, wpisz nazwę i kliknij „Zapisz bieżące dane”. Presety zostają w tej przeglądarce.</p>
+  </section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const F=['dist','cons','price','people','extra','trips'];
+const zl=v=>v.toLocaleString('pl-PL',{style:'currency',currency:'PLN'});
+const num=(v,d=1)=>v.toLocaleString('pl-PL',{maximumFractionDigits:d,minimumFractionDigits:d});
+const val=id=>{const n=parseFloat(String($(id).value).replace(',','.'));return isFinite(n)&&n>=0?n:0};
+
+function calc(){
+  const trips=Math.max(1,Math.round(val('trips'))||1);
+  const km=val('dist')*trips;
+  const l=km*val('cons')/100;
+  const fuel=l*val('price');
+  const total=fuel+val('extra');
+  const ppl=Math.max(1,Math.round(val('people'))||1);
+  $('rPer').textContent=zl(total/ppl);
+  $('rTotal').textContent=zl(total);
+  $('rKm').textContent=num(km)+' km';
+  $('rL').textContent=num(l,2)+' l';
+  $('rFuel').textContent=zl(fuel);
+  $('rPerKm').textContent=km>0?zl(total/km):'–';
+}
+F.forEach(f=>$(f).addEventListener('input',calc));
+const step=(id,d,max)=>{$(id).value=Math.min(max,Math.max(1,(parseInt($(id).value)||1)+d));calc()};
+$('minus').onclick=()=>step('people',-1,9);$('plus').onclick=()=>step('people',1,9);
+$('tminus').onclick=()=>step('trips',-1,999);$('tplus').onclick=()=>step('trips',1,999);
+
+const KEY='dojazd-presety';
+let presets=[];
+try{presets=JSON.parse(localStorage.getItem(KEY))||[]}catch(e){presets=[]}
+presets.forEach(p=>{if(p.trips==null)p.trips=p.round?2:1;delete p.round});
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(presets));return true}catch(e){return false}};
+let confirmIdx=-1;
+
+function render(){
+  const list=$('list');list.innerHTML='';
+  $('empty').hidden=presets.length>0;
+  presets.forEach((p,i)=>{
+    const el=document.createElement('div');el.className='chip';
+    const info=document.createElement('div');info.className='info';
+    const n=document.createElement('div');n.className='name';n.textContent=p.name;
+    const m=document.createElement('div');m.className='meta';
+    m.textContent=`${p.dist} km × ${p.trips} ·${p.cons} l/100 · ${p.price} zł/l · ${p.people} os.${+p.extra?` · +${p.extra} zł`:''}`;
+    info.append(n,m);el.append(info);
+    if(confirmIdx===i){
+      const y=document.createElement('button');y.className='yes';y.textContent='Usuń';
+      y.onclick=()=>{presets.splice(i,1);persist();confirmIdx=-1;render();say('Usunięto preset.')};
+      const c=document.createElement('button');c.textContent='Anuluj';c.onclick=()=>{confirmIdx=-1;render()};
+      el.append(y,c);
+    }else{
+      const ld=document.createElement('button');ld.textContent='Wczytaj';
+      ld.onclick=()=>{F.forEach(f=>$(f).value=p[f]);$('pname').value=p.name;calc();say(`Wczytano „${p.name}”.`)};
+      const d=document.createElement('button');d.className='del';d.textContent='Usuń';d.setAttribute('aria-label','Usuń '+p.name);
+      d.onclick=()=>{confirmIdx=i;render()};
+      el.append(ld,d);
+    }
+    list.append(el);
+  });
+}
+let t;function say(s){$('msg').textContent=s;clearTimeout(t);t=setTimeout(()=>$('msg').textContent='',3500)}
+
+$('saveBtn').onclick=()=>{
+  const name=$('pname').value.trim();
+  if(!name){say('Wpisz nazwę presetu, żeby go zapisać.');$('pname').focus();return}
+  const p={name};F.forEach(f=>p[f]=val(f));p.trips=Math.max(1,Math.round(p.trips)||1);
+  const i=presets.findIndex(x=>x.name.toLowerCase()===name.toLowerCase());
+  if(i>=0)presets[i]=p;else presets.push(p);
+  const ok=persist();confirmIdx=-1;render();
+  say(ok?(i>=0?`Zaktualizowano „${name}”.`:`Zapisano „${name}”.`):'Zapisano tylko do zamknięcia strony — przeglądarka blokuje pamięć.');
+};
+$('pname').addEventListener('keydown',e=>{if(e.key==='Enter')$('saveBtn').click()});
+calc();render();
+</script>
+</body>
+</html>
